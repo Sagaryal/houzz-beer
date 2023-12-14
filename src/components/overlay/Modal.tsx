@@ -1,42 +1,40 @@
 import { Dialog, Transition } from "@headlessui/react";
-import { Fragment, useState } from "react";
-import { IBeer } from "../../interface";
-import { capitalizeWords, generateRandomId } from "../../utils";
+import { FormEvent, Fragment, useState } from "react";
+import { IModalProps, TBeer } from "../../types";
+import { capitalizeWords } from "../../utils";
+import { nanoid } from "nanoid";
 
-const Modal = ({ isOpen, closeModal, onSave }) => {
-  const [beer, setBeer] = useState<IBeer>({
-    id: generateRandomId(),
+const Modal: React.FC<IModalProps> = ({ isModalOpen, closeModal, onSave }): JSX.Element => {
+  const defaultBeerState = {
+    id: nanoid(),
     name: "",
     tagline: "",
     description: "",
     image_url: "src/assets/beer.png",
-  });
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setBeer((prevForm) => ({ ...prevForm, [name]: capitalizeWords(value) }));
   };
 
-  const handleSave = () => {
-    // e.preventDefault();
+  const [beer, setBeer] = useState<TBeer>(defaultBeerState);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setBeer((prevForm) => ({ ...prevForm, [name]: name === "description" ? value : capitalizeWords(value) }));
+  };
+
+  const handleSave = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
     // Pass the beer information to the onSave callback
     onSave(beer);
 
     // Clear the form
-    setBeer({
-      id: generateRandomId(),
-      name: "",
-      tagline: "",
-      description: "",
-      image_url: "src/assets/beer.png",
-    });
+    setBeer(defaultBeerState);
 
     // Close the modal
     closeModal();
   };
 
   return (
-    <Transition appear show={isOpen} as={Fragment}>
+    <Transition appear show={isModalOpen} as={Fragment}>
       <Dialog as="div" className="relative z-10" onClose={closeModal}>
         <Transition.Child
           as={Fragment}
@@ -67,11 +65,11 @@ const Modal = ({ isOpen, closeModal, onSave }) => {
                   Add a New Beer
                 </Dialog.Title>
 
-                {/* Image on Left */}
+                {/* Image */}
                 <img
                   src={beer.image_url}
                   alt="Beer"
-                  className="w-24 h-24 border mb-4 object-contain" // Adjusted the styles to center the image
+                  className="w-24 h-24 border mb-4 object-contain rounded-[0.200rem]" // Adjusted the styles to center the image
                 />
 
                 {/* Form */}
@@ -85,7 +83,7 @@ const Modal = ({ isOpen, closeModal, onSave }) => {
                       onChange={handleInputChange}
                       placeholder="Beer Name*"
                       required
-                      className="mt-1 p-2 w-full border rounded-md"
+                      className="mt-1 p-2 w-full border rounded-[0.200rem]"
                     />
                   </div>
                   <div className="mb-4">
@@ -97,7 +95,7 @@ const Modal = ({ isOpen, closeModal, onSave }) => {
                       onChange={handleInputChange}
                       placeholder="Genre*"
                       required
-                      className="mt-1 p-2 w-full border rounded-md"
+                      className="mt-1 p-2 w-full border rounded-[0.200rem]"
                     />
                   </div>
                   <div className="mb-4">
@@ -109,21 +107,22 @@ const Modal = ({ isOpen, closeModal, onSave }) => {
                       rows={3}
                       placeholder="Description*"
                       required
-                      className="mt-1 p-2 w-full border rounded-md"
+                      className="mt-1 p-2 w-full border rounded-[0.200rem]"
                     />
                   </div>
+
                   {/* Buttons */}
                   <div className="flex justify-end mt-4">
                     <button
                       type="button"
-                      className="mr-2 inline-flex justify-center rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500"
+                      className="mr-2 inline-flex justify-center rounded-[0.200rem] border-gray-300 px-8 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 "
                       onClick={closeModal}
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
-                      className="inline-flex justify-center rounded-md border border-transparent bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500"
+                      className="inline-flex justify-center rounded-[0.200rem] border border-transparent bg-blue-500 px-8 py-2 text-sm font-medium text-white hover:bg-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500"
                     >
                       Save
                     </button>

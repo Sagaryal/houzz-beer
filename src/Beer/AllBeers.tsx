@@ -1,20 +1,22 @@
 import React from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { IBeer } from "../interface";
-import CardLayout from "../common/cards/CardLayout";
+import { TBeer } from "../types";
+import CardLayout from "../components/cards/CardLayout";
 import { fetchBeers } from "../apis/queries";
 
-function AllBeers() {
+const AllBeers: React.FC = (): JSX.Element => {
   const { status, error, data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
     queryKey: ["beers"],
     queryFn: ({ pageParam }) => fetchBeers(pageParam),
     initialPageParam: 1,
     getNextPageParam: (lastPage, _, lastPageParam) => {
+      /**
+       * If previous Page data is empty (i.e lastPage) then
+       * no need to fetch further pages.
+       */
       return lastPage.length ? lastPageParam + 1 : undefined;
     },
   });
-
-  console.log("All beer tab re-rendered");
 
   return (
     <>
@@ -24,7 +26,7 @@ function AllBeers() {
         <span>Error: {error.message}</span>
       ) : (
         <>
-          {data.pages.map((page: IBeer[], index) => (
+          {data.pages.map((page: TBeer[], index) => (
             <React.Fragment key={index}>
               <CardLayout cards={page} />
             </React.Fragment>
@@ -65,6 +67,6 @@ function AllBeers() {
       )}
     </>
   );
-}
+};
 
 export default AllBeers;

@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
-import MyModal from "../common/overlay/Modal";
-import CardLayout from "../common/cards/CardLayout";
-import { IBeer } from "../interface";
+import Modal from "../components/overlay/Modal";
+import CardLayout from "../components/cards/CardLayout";
+import { IMyBeersProps, TBeer } from "../types";
 
-const MyBeers = ({ isModalOpen, openModal, closeModal }) => {
+const MyBeers: React.FC<IMyBeersProps> = ({ isModalOpen, openModal, closeModal }): JSX.Element => {
   const storageItems = localStorage.getItem("beers");
-  const initialBeers = storageItems ? JSON.parse(storageItems) : [];
+  const initialBeers: TBeer[] = storageItems ? JSON.parse(storageItems) : [];
 
-  const [beers, setBeers] = useState<IBeer[]>(initialBeers);
+  const [beers, setBeers] = useState<TBeer[]>(initialBeers);
 
-  const onSave = (beer: IBeer) => {
+  const onSave = (beer: TBeer) => {
     // Save the beer to the list
     setBeers((prevBeers) => [...prevBeers, beer]);
   };
@@ -19,12 +19,10 @@ const MyBeers = ({ isModalOpen, openModal, closeModal }) => {
     localStorage.setItem("beers", JSON.stringify(beers));
   }, [beers]);
 
-  console.log("Mybeer tabs re-rendered");
-
   return (
     <>
-      {beers.length === 0 ? (
-        <div className={`min-h-screen max-h-50vh flex items-center bg-gray-100 justify-center`}>
+      {!beers.length ? (
+        <div className={`h-[80vh] flex items-center bg-gray-100 justify-center`}>
           <div className="text-center">
             <p className="text-lg mb-2">Nothing to see yet.</p>
             <p className="mb-4">
@@ -39,7 +37,7 @@ const MyBeers = ({ isModalOpen, openModal, closeModal }) => {
         <CardLayout cards={beers} />
       )}
 
-      <MyModal isOpen={isModalOpen} closeModal={closeModal} onSave={onSave} />
+      <Modal isModalOpen={isModalOpen} closeModal={closeModal} onSave={onSave} />
     </>
   );
 };
